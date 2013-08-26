@@ -1,5 +1,7 @@
 # See http://clang.llvm.org/docs/IntroductionToTheClangAST.html
 
+from clang.cindex import Index
+
 class Decl(object):
   """docstring for Decl"""
   def __init__(self, arg):
@@ -23,6 +25,10 @@ class Stmt(object):
   def __init__(self, arg):
     super(Stmt, self).__init__()
     self.arg = arg
+
+if __name__ == '__main__':
+  index = Index.create()
+  index.parse(sys.argv[1])
 
 
     
