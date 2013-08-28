@@ -11,7 +11,10 @@ class TestCppParsing(unittest.TestCase):
 
   def test_basic_cpp(self):
     unit = self.parser.parse('simple.cpp')
-    assert(unit.Functions)
+    self.assertEquals(len(unit.functions), 1)
+    f = unit.functions[0]
+    self.assertEquals(f.name, "main")
+    self.assertEquals(len(f.args), 0)
 
 if __name__ == '__main__':
   unittest.main()
