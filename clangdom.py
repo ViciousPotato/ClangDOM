@@ -9,6 +9,9 @@ class Object(object):
   def __getattr__(self, name):
     self.__dict__.get(name, None)
 
+class Unit(Object):
+  pass
+
 class Decl(object):
   """docstring for Decl"""
   def __init__(self, arg):
@@ -54,6 +57,7 @@ class Parser(object):
 
   def parse(self, src):
     unit = self.index.parse(src)
+    self.ast.includes = [i for i in unit.get_includes() if i.depth == 1]
     self.visit(unit.cursor)
     return self.ast
 
@@ -74,11 +78,13 @@ def visit(node, depth=1):
 if __name__ == '__main__':
   index = Index.create()
   u = index.parse(sys.argv[1])
-  visit(u.cursor)
+  #visit(u.cursor)
 
   parser = Parser()
   u = parser.parse(sys.argv[1])
   print u.functions
+  import pdb
+  pdb.set_trace()
 
 
     
