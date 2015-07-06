@@ -2,6 +2,11 @@ import sys
 # See http://clang.llvm.org/docs/IntroductionToTheClangAST.html
 from clang.cindex import Index, CursorKind
 
+def auto_load():
+  """ Find libclang and load it """
+  if sys.startswith('linux'):
+    pass
+
 class Object(object):
   def __setattr__(self, name, value):
     self.__dict__[name] = value
