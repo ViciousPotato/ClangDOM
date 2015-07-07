@@ -1,7 +1,15 @@
 import os
 import sys
 
-sys.path.append('../')
+def parent_dir():
+  return os.path.abspath(
+    os.path.join(
+      os.path.dirname(os.path.abspath(__file__)),
+      '../'
+    )
+  )
+
+sys.path.append(parent_dir())
 
 import unittest
 import clangdom

@@ -117,8 +117,7 @@ class Parser(object):
 
   def parse_function(self, cursor):
     for arg in cursor.get_arguments():
-      import pdb
-      pdb.set_trace()
+      pass
 
   def parse(self, src):
     unit = self.index.parse(src,
