@@ -23,12 +23,17 @@ class TestCppParsing(unittest.TestCase):
     self.parser = clangdom.Parser()
 
   def test_basic_cpp(self):
-    print test_file('simple.cpp')
     unit = self.parser.parse(test_file('simple.cpp'))
-    self.assertEquals(len(unit.functions), 1)
+    self.assertEquals(len(unit.functions), 2)
     f = unit.functions[0]
+    self.assertEquals(f.name, "f")
+    self.assertEquals(len(f.params), 1)
+    self.assertEquals(f.params[0].name, 'a')
+    self.assertEquals(f.params[0].type, 'int')
+
+    f = unit.functions[1]
     self.assertEquals(f.name, "main")
-    self.assertEquals(len(f.args), 0)
+    self.assertEquals(len(f.params), 0)
 
   def test_include_files(self):
     unit = self.parser.parse(test_file('include.cpp'))

@@ -43,9 +43,9 @@ class FunctionParam(object):
   def __init__(self, name, type):
     self.name = name
     self.type = type
-    super(Function, self).__init__()
+    super(FunctionParam, self).__init__()
 
-  def __str__(self):
+  def __repr__(self):
     return "%s %s" % (self.type, self.name)
 
 class Function(object):
@@ -56,11 +56,12 @@ class Function(object):
     self.returnType = returnType
     super(Function, self).__init__()
 
-  def __str__(self):
-    return "%s %s(%s)" % (returnType, name, ",".join(params))
+  def __repr__(self):
+    params = [p.type + ' ' + p.name for p in self.params]
+    return "%s %s(%s)" % (self.returnType, self.name, ",".join(params))
 
   @classmethod
-  def parse(cursor):
+  def parse(cls, cursor):
     func_name = cursor.spelling
     result_type = cursor.result_type.spelling
     args = [] 
