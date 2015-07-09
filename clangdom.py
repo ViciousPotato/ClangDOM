@@ -77,6 +77,35 @@ class IncludeFile(object):
     self.type = type
     super(IncludeFile, self).__init__()
 
+  @classmethod
+  def parse(cls, src, cursor):
+    includes = []
+    included = {}
+    """
+    for i in cursor.get_includes():
+      if i.depth == 1:
+        includes.append(IncludeFile(i.include.name))
+        included[i.include.name] = 1
+    """
+
+    content = file(src).read()
+    content = re.sub(r'/\*.+?\*/', '', content, flags=re.S) # Remove /* comments
+    
+    for line in content.splitlines():
+      m = re.match(r'^\s*#include\s*(<|")(.+?)(>|")\s*', line)
+      if m:
+        l, f, r = m.groups()
+        fullname = l + f + r
+        if included.has_key(fullname):
+          continue
+        if l == "<":
+          includes.append(IncludeFile(f))
+        else:
+          includes.append(IncludeFile(f, "relative"))
+        included[fullname] = 1
+
+    return includes
+
 class Parser(object):
   def __init__(self):
     self.index = Index.create()
@@ -95,24 +124,7 @@ class Parser(object):
       if m:
         self.ast.includes.append(m.groups()[0])
     """
-    self.ast.includes = [IncludeFile(i.include.name) for i in unit.get_includes() if i.depth == 1]
-    content = file(src).read()
-    content = re.sub(r'/\*.+?\*/', '', content, flags=re.S) # Remove /* comments
-    includes = []
-    included = {}
-    for line in content.splitlines():
-      m = re.match(r'^\s*#include\s*(<|")(.+?)(>|")\s*', line)
-      if m:
-        l, f, r = m.groups()
-        fullname = l + f + r
-        if included.has_key(fullname):
-          continue
-        if l == "<":
-          includes.append(IncludeFile(f))
-        else:
-          includes.append(IncludeFile(f, "relative"))
-        included[fullname] = 1
-    self.ast.includes = includes
+    self.ast.includes = IncludeFile.parse(src, unit)
 
     # include statement is not in comments or literal string
 
