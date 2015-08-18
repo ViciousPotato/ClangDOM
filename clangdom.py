@@ -39,6 +39,10 @@ class Stmt(object):
     super(Stmt, self).__init__()
     self.arg = arg
 
+  @classmethod
+  def parse(cls, cursor):
+    pass
+
 class FunctionParam(object):
   def __init__(self, name, type):
     self.name = name
@@ -69,6 +73,13 @@ class Function(object):
       name = arg.spelling
       type = arg.type.spelling
       args.append(FunctionParam(name, type))
+
+    statements = []
+    for child in cursor.get_children():
+      if child.kind == CursorKind.COMPOUND_STMT:
+        for stmt in child.get_children():
+          statements.append(Stmt.parse(stmt))
+
     return Function(func_name, args, result_type)
 
 class IncludeFile(object):
@@ -130,7 +141,8 @@ class Parser(object):
 
   def parse_function(self, cursor):
     for arg in cursor.get_arguments():
-      pass
+      import pdb
+      pdb.set_trace()
 
   def parse(self, src):
     unit = self.index.parse(src,
@@ -145,11 +157,10 @@ class Parser(object):
   def visit(self, node):
     for child in node.get_children():
       if child.kind == CursorKind.FUNCTION_DECL:
-        self.parse_function(child)
         self.ast.functions = self.ast.functions or []
         self.ast.functions.append(Function.parse(child))
-
-      self.visit(child)
+      else:
+        self.visit(child)
 
 def visit(node, depth=1):
   print '    ' * depth, node.kind, node.xdata, node.spelling
