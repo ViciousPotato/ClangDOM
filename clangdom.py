@@ -117,6 +117,9 @@ class IncludeFile(object):
 
     return includes
 
+  def __repr__(self):
+    return "IncludeFile (%s:%s)" % (self.name, self.type)   
+
 class Parser(object):
   def __init__(self):
     self.index = Index.create()
@@ -146,7 +149,7 @@ class Parser(object):
 
   def parse(self, src):
     unit = self.index.parse(src,
-      args = ['-Xclang', '-ast-dump', '-fsyntax-only'],
+      args = ['-xc++', '-Xclang', '-ast-dump', '-fsyntax-only'],
       options = TranslationUnit.PARSE_INCOMPLETE)
 
     self.parse_includes(src, unit)

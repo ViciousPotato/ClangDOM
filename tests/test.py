@@ -43,5 +43,9 @@ class TestCppParsing(unittest.TestCase):
     self.assertTrue(unit.includes[2].name.endswith('some/fairy/land'))
     self.assertTrue(unit.includes[3].name.endswith('../and/its/parent'))
 
+  def test_irbuilder_h(self):
+    unit = self.parser.parse(test_file('IRBuilder.h'))
+    self.assertEquals(len(unit.includes), 6)
+
 if __name__ == '__main__':
   unittest.main()
