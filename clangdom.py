@@ -16,6 +16,13 @@ class Object(object):
   def __getattr__(self, name):
     self.__dict__.get(name, None)
 
+class Node(object):
+  def __init__(self):
+    self.children = []
+
+  def visit(self, parent, children):
+    pass
+
 class Unit(Object):
   pass
 
@@ -82,6 +89,33 @@ class Function(object):
 
     return Function(func_name, args, result_type)
 
+class Class(Node):
+  def __init__(self, name):
+    self.name = name
+
+  @classmethod
+  def parse(cls, cursor):
+    name = cursor.spelling
+    return Class(name)
+
+class NameSpace(object):
+  def __init__(self, name="<anonymous>", classes=[], functions=[]):
+    self.name = name
+    self.classes = classes
+    self.functions = functions
+
+  @classmethod
+  def parse(cls, cursor):
+    name = cursor.spelling
+    classes = []
+
+    for child in cursor.get_children():
+      if child.kind == CursorKind.CLASS_DECL:
+        classes.append(Class.parse(child))
+
+    return NameSpace(name, classes, [])
+
+
 class IncludeFile(object):
   def __init__(self, name, type="absolute"):
     self.name = name
@@ -144,8 +178,7 @@ class Parser(object):
 
   def parse_function(self, cursor):
     for arg in cursor.get_arguments():
-      import pdb
-      pdb.set_trace()
+      pass
 
   def parse(self, src):
     unit = self.index.parse(src,
@@ -162,6 +195,9 @@ class Parser(object):
       if child.kind == CursorKind.FUNCTION_DECL:
         self.ast.functions = self.ast.functions or []
         self.ast.functions.append(Function.parse(child))
+      elif child.kind == CursorKind.NAMESPACE:
+        self.ast.namespaces = self.ast.functions or []
+        self.ast.namespaces.append(NameSpace.parse(child))
       else:
         self.visit(child)
 
@@ -171,10 +207,6 @@ def visit(node, depth=1):
     visit(c, depth+1)
 
 if __name__ == '__main__':
-  index = Index.create()
-  u = index.parse(sys.argv[1])
-  #visit(u.cursor)
-
   parser = Parser()
-  u = parser.parse(sys.argv[1])
-  print u.functions
+  unit = parser.parse('./tests/IRBuilder.h')
+  print unit.functions
