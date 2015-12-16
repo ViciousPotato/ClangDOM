@@ -90,13 +90,27 @@ class Function(object):
     return Function(func_name, args, result_type)
 
 class Class(Node):
-  def __init__(self, name):
+  def __init__(self, name, functions = []):
     self.name = name
+    self.template_args = []
+    self.functions = functions
 
   @classmethod
   def parse(cls, cursor):
     name = cursor.spelling
-    return Class(name)
+    functions = []
+
+    for child in cursor.get_children():
+      if child.kind == CursorKind.TEMPLATE_NON_TYPE_PARAMETER:
+        pass
+      elif child.kind == CursorKind.CXX_ACCESS_SPEC_DECL:
+        # access_specifier
+        pass
+      elif child.kind == CursorKind.CXX_METHOD:
+        function = Function.parse(child)
+        functions.append(function)
+
+    return Class(name, functions=functions)
 
 class NameSpace(object):
   def __init__(self, name="<anonymous>", classes=[], functions=[]):
@@ -110,7 +124,7 @@ class NameSpace(object):
     classes = []
 
     for child in cursor.get_children():
-      if child.kind == CursorKind.CLASS_DECL:
+      if child.kind == CursorKind.CLASS_DECL or child.kind == CursorKind.CLASS_TEMPLATE:
         classes.append(Class.parse(child))
 
     return NameSpace(name, classes, [])
