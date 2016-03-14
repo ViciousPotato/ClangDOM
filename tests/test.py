@@ -45,7 +45,9 @@ class TestCppParsing(unittest.TestCase):
 
   def test_irbuilder_h(self):
     unit = self.parser.parse(test_file('IRBuilder.h'))
-    self.assertEquals(len(unit.includes), 6)
+    self.assertEquals(len(unit.includes), 13)
+    self.assertEquals(len(unit.namespaces), 1)
+    self.assertEquals(len(unit.namespaces[0].classes), 4)
 
 if __name__ == '__main__':
   unittest.main()
